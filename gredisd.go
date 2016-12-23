@@ -1,4 +1,4 @@
-package gredisd
+package main
 
 import (
 	"github.com/valery-barysok/gredisd/app"
