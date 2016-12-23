@@ -17,10 +17,11 @@ with Go lang only.
             --databases <count>          Set the number of databases. The default database is DB 0, you can select
                                          a different one on a per-connection basis using SELECT <dbid> where
                                          dbid is a number between 0 and 'databases'-1
-    
+            --trace_protocol <bool>      Trace low level read/write operations
+
     Authorization Options:
             --auth <token>               Authorization token required for connections
-    
+
     Common Options:
         -h, --help                       Show this message
         -v, --version                    Show version
