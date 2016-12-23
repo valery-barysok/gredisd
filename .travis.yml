@@ -1,0 +1,22 @@
+language: go
+
+os:
+  - linux
+  - osx
+
+go:
+  - 1.6
+  - 1.7
+  - tip
+
+install:
+- go get -t ./...
+- go get honnef.co/go/staticcheck/cmd/staticcheck
+
+script:
+- go build -v
+- go fmt ./...
+- go vet ./...
+- go test -i -race ./...
+- go test -v -race ./...
+- staticcheck ./...
