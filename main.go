@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/valery-barysok/gredisd/app"
+	"github.com/valery-barysok/gredisd/gredisd-app"
 )
 
 var usageStr = `
@@ -53,7 +54,7 @@ func main() {
 
 	flag.Parse()
 
-	gApp := NewApp(&opts)
+	gApp := gredisd.NewApp(&opts)
 	if showVersion {
 		gApp.ShowVersion()
 		os.Exit(0)
