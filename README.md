@@ -38,12 +38,12 @@ with Go lang only.
 
 ## Docker
 
-    docker build -t=gredisd .
-    docker run -p 16379:16379 -it --rm --network=bridge --name gredisd gredisd
+    sudo docker build -t=gredisd .
+    sudo docker run -p 16379:16379 -it --rm --network=bridge --name gredisd gredisd
 
 ## Docker Compose
 
-    docker-compose up
+    sudo docker-compose up -d
 
 ## Installation
 
@@ -62,7 +62,7 @@ You need [*Go*](http://golang.org/) version 1.6+ [installed](https://golang.org/
 
 ## Running
 
-To start the GRedis server with default settings (and no authentication), you can invoke the `gredisd` binary with no [command line options](#command-line-arguments) or [configuration file](#configuration-file).
+To start the GRedis server with default settings (and no authentication), you can invoke the `gredisd` binary with no [command line options](#command-line).
 
 ```sh
 > ./gredisd
