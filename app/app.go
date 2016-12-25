@@ -90,7 +90,6 @@ func (app *App) Run() error {
 		log.Println("App requires authentication")
 	}
 
-	//app.server = server.NewServer(&opts, NewClientProvider(app))
 	app.server = server.NewServer(&opts, NewClientProvider(app))
 	app.server.Start()
 

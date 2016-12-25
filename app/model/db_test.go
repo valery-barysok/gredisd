@@ -10,23 +10,6 @@ func TestIntegrationForAllCommandsAtOnce(t *testing.T) {
 
 	dbModel := newDBModel(0)
 	if Expect(dbModel).ToNot(Equal(nil)) {
-		//pingRes, err := dbModel.Ping()
-		//Expect(err).ToNot(HaveOccurred())
-		//Expect(pingRes).To(Equal("PONG"))
-		//
-		//msg := "test echo cmd"
-		//bulkRes, err := dbModel.PingMsg(msg)
-		//Expect(err).ToNot(HaveOccurred())
-		//Expect(bulkRes).To(BeEquivalentTo(msg))
-		//
-		//bulkRes, err = dbModel.Echo(msg)
-		//Expect(err).ToNot(HaveOccurred())
-		//Expect(bulkRes).To(BeEquivalentTo(msg))
-		//
-		//list, err := dbModel.Command()
-		//Expect(err).ToNot(HaveOccurred())
-		//Expect(list).ToNot(Equal(nil))
-
 		// Valid regexp
 		list, err := dbModel.Keys([]byte(".*"))
 		Expect(err).ToNot(HaveOccurred())
