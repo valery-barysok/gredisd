@@ -85,7 +85,7 @@ func BindExpire(app *app.App) {
 func BindNotFound(appl *app.App) {
 	appl.BindNotFound(func(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 		res.WriteUnknownCommandError(req.Cmd)
-		res.End()
+		res.Flush()
 		return nil
 	})
 }
@@ -94,14 +94,14 @@ func BindNotFound(appl *app.App) {
 func BindError(appl *app.App) {
 	appl.BindError(func(context *app.ClientContext, err error, res *resp.Writer) {
 		log.Println(err)
-		res.End()
+		res.Flush()
 	})
 }
 
 func authFilter(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) (bool, error) {
 	if req.Cmd != AuthCommand && context.RequireAuth {
 		res.WriteErrorString("NOAUTH Authentication required.")
-		res.End()
+		res.Flush()
 		return true, nil
 	}
 	return false, nil
@@ -119,7 +119,7 @@ func authCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer)
 			res.WriteOK()
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -136,7 +136,7 @@ func selectCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Write
 			res.WriteOK()
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -147,7 +147,7 @@ func echoCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer)
 	} else {
 		res.WriteBulkString(req.Args[0].BulkString())
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -160,7 +160,7 @@ func pingCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer)
 	} else {
 		res.WritePong()
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -172,7 +172,7 @@ func shutdownCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Wri
 func commandCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	commands := context.App.Commands()
 	res.WriteArray(commands)
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -188,7 +188,7 @@ func keysCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer)
 			res.WriteArray(keys)
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -204,7 +204,7 @@ func existsCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Write
 
 		res.WriteInteger(context.DB.Exists(keys...))
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -215,6 +215,6 @@ func expireCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Write
 	} else {
 		res.WriteInteger(context.DB.Expire(req.Args[0].BulkString(), req.Args[1].BulkString()))
 	}
-	res.End()
+	res.Flush()
 	return nil
 }

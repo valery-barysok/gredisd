@@ -39,7 +39,7 @@ func setCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) 
 		context.DB.Set(req.Args[0].BulkString(), req.Args[1].BulkString())
 		res.WriteOK()
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -57,7 +57,7 @@ func getCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) 
 			res.WriteNilBulk()
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -74,6 +74,6 @@ func delCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) 
 		cnt := context.DB.Del(keys...)
 		res.WriteInteger(cnt)
 	}
-	res.End()
+	res.Flush()
 	return nil
 }

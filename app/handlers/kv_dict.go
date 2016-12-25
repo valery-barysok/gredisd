@@ -55,7 +55,7 @@ func hSetCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer)
 			res.WriteInteger(cnt)
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -73,7 +73,7 @@ func hGetCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer)
 			res.WriteNilBulk()
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -95,7 +95,7 @@ func hDelCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer)
 			res.WriteInteger(cnt)
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -111,7 +111,7 @@ func hLenCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer)
 			res.WriteInteger(l)
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -127,6 +127,6 @@ func hExistsCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writ
 			res.WriteInteger(cnt)
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }

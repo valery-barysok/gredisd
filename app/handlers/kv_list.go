@@ -82,7 +82,7 @@ func lrpushCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Write
 			res.WriteInteger(cnt)
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -112,7 +112,7 @@ func lrpopCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer
 			res.WriteNilBulk()
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -140,7 +140,7 @@ func llenCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer)
 			res.WriteInteger(cnt)
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -157,7 +157,7 @@ func linsertCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writ
 			res.WriteInteger(l)
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -175,7 +175,7 @@ func lindexCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Write
 			res.WriteNilBulk()
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
 
@@ -193,6 +193,6 @@ func lrangeCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Write
 			res.WriteNilBulk()
 		}
 	}
-	res.End()
+	res.Flush()
 	return nil
 }
