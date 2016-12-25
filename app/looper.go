@@ -12,7 +12,7 @@ var errInvalidRequest = errors.New("ERR Invalid Request")
 
 type RespCommand struct {
 	Cmd  string
-	Args []*resp.Item
+	Args []*resp.Message
 }
 
 type looper struct {
@@ -55,7 +55,7 @@ func (looper *looper) readRespCommand(reader *resp.Reader) (*RespCommand, error)
 	}
 
 	switch it := item.Value.(type) {
-	case []*resp.Item:
+	case []*resp.Message:
 		items := it
 		return &RespCommand{
 			Cmd:  string(bytes.ToLower(items[0].BulkString())),
