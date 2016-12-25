@@ -1,7 +1,7 @@
 package model
 
-func newKVDictType() *valueItem {
-	return &valueItem{
+func newKVDictType() *keyValue {
+	return &keyValue{
 		kvType: kvDictType,
 		dict:   make(map[string]string),
 	}

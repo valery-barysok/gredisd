@@ -25,7 +25,7 @@ func newDBModel(index int) *DBModel {
 	model := &DBModel{
 		index: index,
 	}
-	model.kv = newKVModel(model)
+	model.kv = newKVModel()
 	return model
 }
 

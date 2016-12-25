@@ -8,8 +8,8 @@ import (
 type lrPush func(list *list.List, v interface{}) *list.Element
 type lrPop func(list *list.List) []byte
 
-func newKVListType() *valueItem {
-	return &valueItem{
+func newKVListType() *keyValue {
+	return &keyValue{
 		kvType: kvListType,
 		list:   list.New(),
 	}

@@ -9,7 +9,7 @@ import (
 
 var errWrongType = errors.New("WRONGTYPE Operation against a key holding the wrong kind of value")
 
-type valueItem struct {
+type keyValue struct {
 	kvType byte
 	value  []byte
 	list   *list.List
@@ -17,8 +17,8 @@ type valueItem struct {
 	ttl    int64
 }
 
-func newKVType(s []byte) *valueItem {
-	return &valueItem{
+func newKeyValue(s []byte) *keyValue {
+	return &keyValue{
 		kvType: kvType,
 		value:  s,
 	}
@@ -26,14 +26,12 @@ func newKVType(s []byte) *valueItem {
 
 type KVModel struct {
 	mu      sync.RWMutex
-	storage map[string]*valueItem
-	db      *DBModel
+	storage map[string]*keyValue
 }
 
-func newKVModel(db *DBModel) *KVModel {
+func newKVModel() *KVModel {
 	return &KVModel{
-		storage: make(map[string]*valueItem),
-		db:      db,
+		storage: make(map[string]*keyValue),
 	}
 }
 
@@ -99,7 +97,7 @@ func (kv *KVModel) keys(pattern []byte) ([]interface{}, error) {
 }
 
 func (kv *KVModel) set(key []byte, value []byte) {
-	kv.storage[string(key)] = newKVType(value)
+	kv.storage[string(key)] = newKeyValue(value)
 }
 
 func (kv *KVModel) get(key []byte) ([]byte, error) {
