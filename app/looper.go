@@ -49,17 +49,17 @@ func (looper *looper) loop(context *ClientContext, r io.Reader, w io.Writer) {
 }
 
 func (looper *looper) readRespCommand(reader *resp.Reader) (*RespCommand, error) {
-	item, err := reader.Read()
+	msg, err := reader.Read()
 	if err != nil {
 		return nil, err
 	}
 
-	switch it := item.Value.(type) {
+	switch it := msg.Value.(type) {
 	case []*resp.Message:
-		items := it
+		msgs := it
 		return &RespCommand{
-			Cmd:  string(bytes.ToLower(items[0].BulkString())),
-			Args: items[1:],
+			Cmd:  string(bytes.ToLower(msgs[0].BulkString())),
+			Args: msgs[1:],
 		}, nil
 	default:
 		return nil, errInvalidRequest
