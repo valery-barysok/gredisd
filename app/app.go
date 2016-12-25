@@ -33,7 +33,7 @@ type App struct {
 	info   Info
 	opts   *Options
 	server *server.Server
-	router *Router
+	router *router
 	model  *model.AppModel
 }
 

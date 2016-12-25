@@ -2,7 +2,6 @@ package app
 
 import (
 	"bufio"
-	"io"
 	"net"
 	"sync"
 	"time"
@@ -13,13 +12,9 @@ import (
 	"os"
 )
 
-type Looper interface {
-	Loop(context *ClientContext, r io.Reader, w io.Writer)
-}
-
 type clientProvider struct {
 	app    *App
-	looper Looper
+	looper *looper
 }
 
 func NewClientProvider(app *App) server.ClientProvider {
@@ -55,7 +50,7 @@ type client struct {
 	bufWriter *bufio.Writer
 	startTime time.Time
 	last      time.Time
-	looper    Looper
+	looper    *looper
 	context   *ClientContext
 }
 
@@ -99,7 +94,7 @@ func (client *client) Loop() {
 		return
 	}
 
-	client.looper.Loop(client.context, br, bw)
+	client.looper.loop(client.context, br, bw)
 }
 
 func (client *client) CloseConnection() {

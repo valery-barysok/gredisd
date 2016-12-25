@@ -83,7 +83,7 @@ func BindExpire(app *app.App) {
 
 // BindNotFound binds handler for handling all unknown commands
 func BindNotFound(appl *app.App) {
-	appl.BindNotFound(func(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+	appl.BindNotFound(func(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 		res.WriteUnknownCommandError(req.Cmd)
 		res.End()
 		return nil
@@ -98,7 +98,7 @@ func BindError(appl *app.App) {
 	})
 }
 
-func authFilter(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) (bool, error) {
+func authFilter(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) (bool, error) {
 	if req.Cmd != AuthCommand && context.RequireAuth {
 		res.WriteErrorString("NOAUTH Authentication required.")
 		res.End()
@@ -107,7 +107,7 @@ func authFilter(context *app.ClientContext, req *app.RespRequest, res *resp.Writ
 	return false, nil
 }
 
-func authCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func authCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 1 {
 		res.WriteArityError(req.Cmd)
@@ -123,7 +123,7 @@ func authCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer)
 	return nil
 }
 
-func selectCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func selectCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 1 {
 		res.WriteArityError(req.Cmd)
@@ -140,7 +140,7 @@ func selectCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Write
 	return nil
 }
 
-func echoCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func echoCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 1 {
 		res.WriteArityError(req.Cmd)
@@ -151,7 +151,7 @@ func echoCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer)
 	return nil
 }
 
-func pingCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func pingCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l > 1 {
 		res.WriteArityError(req.Cmd)
@@ -164,19 +164,19 @@ func pingCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer)
 	return nil
 }
 
-func shutdownCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func shutdownCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	context.App.Shutdown()
 	return errors.New("Shutdown command received from client")
 }
 
-func commandCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func commandCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	commands := context.App.Commands()
 	res.WriteArray(commands)
 	res.End()
 	return nil
 }
 
-func keysCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func keysCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 1 {
 		res.WriteArityError(req.Cmd)
@@ -192,7 +192,7 @@ func keysCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer)
 	return nil
 }
 
-func existsCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func existsCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l < 1 {
 		res.WriteArityError(req.Cmd)
@@ -208,7 +208,7 @@ func existsCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Write
 	return nil
 }
 
-func expireCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func expireCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 2 {
 		res.WriteArityError(req.Cmd)

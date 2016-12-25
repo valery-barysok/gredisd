@@ -31,7 +31,7 @@ func BindDel(app *app.App) {
 	app.Bind(DelCommand, delCmd)
 }
 
-func setCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func setCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l < 2 {
 		res.WriteArityError(req.Cmd)
@@ -43,7 +43,7 @@ func setCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) 
 	return nil
 }
 
-func getCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func getCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 1 {
 		res.WriteArityError(req.Cmd)
@@ -61,7 +61,7 @@ func getCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) 
 	return nil
 }
 
-func delCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func delCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l < 1 {
 		res.WriteArityError(req.Cmd)

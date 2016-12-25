@@ -8,10 +8,10 @@ import (
 
 type ErrorHandler func(context *ClientContext, err error, res *resp.Writer)
 
-type Filter func(context *ClientContext, req *RespRequest, res *resp.Writer) (bool, error)
-type Handler func(context *ClientContext, req *RespRequest, res *resp.Writer) error
+type Filter func(context *ClientContext, req *RespCommand, res *resp.Writer) (bool, error)
+type Handler func(context *ClientContext, req *RespCommand, res *resp.Writer) error
 
-type Router struct {
+type router struct {
 	filters []Filter
 	routes  map[string]Handler
 
@@ -19,38 +19,38 @@ type Router struct {
 	errorHandler ErrorHandler
 }
 
-func NewRouter() *Router {
-	return &Router{
+func NewRouter() *router {
+	return &router{
 		filters: make([]Filter, 0),
 		routes:  make(map[string]Handler),
 	}
 }
 
 // BindFilter binds precondition filter
-func (router *Router) BindFilter(filter Filter) {
+func (router *router) BindFilter(filter Filter) {
 	router.filters = append(router.filters, filter)
 }
 
-func (router *Router) Bind(cmd string, handler Handler) Handler {
+func (router *router) Bind(cmd string, handler Handler) Handler {
 	cmd = strings.ToLower(cmd)
 	oldHandler := router.routes[cmd]
 	router.routes[cmd] = handler
 	return oldHandler
 }
 
-func (router *Router) BindNotFound(handler Handler) Handler {
+func (router *router) BindNotFound(handler Handler) Handler {
 	oldHandler := router.notFound
 	router.notFound = handler
 	return oldHandler
 }
 
-func (router *Router) BindError(errorHandler ErrorHandler) ErrorHandler {
+func (router *router) BindError(errorHandler ErrorHandler) ErrorHandler {
 	oldHandler := router.errorHandler
 	router.errorHandler = errorHandler
 	return oldHandler
 }
 
-func (router *Router) Serve(context *ClientContext, req *RespRequest, res *resp.Writer) error {
+func (router *router) Serve(context *ClientContext, req *RespCommand, res *resp.Writer) error {
 	for _, filter := range router.filters {
 		done, err := filter(context, req, res)
 		if err != nil {
@@ -64,7 +64,7 @@ func (router *Router) Serve(context *ClientContext, req *RespRequest, res *resp.
 	return router.serve(context, req, res)
 }
 
-func (router *Router) serve(context *ClientContext, req *RespRequest, res *resp.Writer) error {
+func (router *router) serve(context *ClientContext, req *RespCommand, res *resp.Writer) error {
 	cmd := req.Cmd
 
 	if handle := router.routes[cmd]; handle != nil {

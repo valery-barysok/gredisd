@@ -14,6 +14,7 @@ type valueItem struct {
 	value  []byte
 	list   *list.List
 	dict   map[string]string
+	ttl    int64
 }
 
 func newKVType(s []byte) *valueItem {

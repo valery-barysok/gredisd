@@ -65,7 +65,7 @@ func BindLRange(app *app.App) {
 type lrPush func(db *model.DBModel, key []byte, values ...[]byte) (int, error)
 type lrPop func(db *model.DBModel, key []byte) ([]byte, error)
 
-func lrpushCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer, push lrPush) error {
+func lrpushCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer, push lrPush) error {
 	l := len(req.Args)
 	if l < 1 {
 		res.WriteArityError(req.Cmd)
@@ -86,19 +86,19 @@ func lrpushCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Write
 	return nil
 }
 
-func lpushCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func lpushCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	return lrpushCmd(context, req, res, func(db *model.DBModel, key []byte, values ...[]byte) (int, error) {
 		return db.LPush(key, values...)
 	})
 }
 
-func rpushCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func rpushCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	return lrpushCmd(context, req, res, func(db *model.DBModel, key []byte, values ...[]byte) (int, error) {
 		return db.RPush(key, values...)
 	})
 }
 
-func lrpopCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer, pop lrPop) error {
+func lrpopCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer, pop lrPop) error {
 	l := len(req.Args)
 	if l != 1 {
 		res.WriteArityError(req.Cmd)
@@ -116,19 +116,19 @@ func lrpopCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer
 	return nil
 }
 
-func lpopCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func lpopCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	return lrpopCmd(context, req, res, func(db *model.DBModel, key []byte) ([]byte, error) {
 		return db.LPop(key)
 	})
 }
 
-func rpopCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func rpopCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	return lrpopCmd(context, req, res, func(db *model.DBModel, key []byte) ([]byte, error) {
 		return db.RPop(key)
 	})
 }
 
-func llenCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func llenCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 1 {
 		res.WriteArityError(req.Cmd)
@@ -144,7 +144,7 @@ func llenCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer)
 	return nil
 }
 
-func linsertCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func linsertCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 4 {
 		res.WriteArityError(req.Cmd)
@@ -161,7 +161,7 @@ func linsertCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writ
 	return nil
 }
 
-func lindexCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func lindexCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 2 {
 		res.WriteArityError(req.Cmd)
@@ -179,7 +179,7 @@ func lindexCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Write
 	return nil
 }
 
-func lrangeCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func lrangeCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 3 {
 		res.WriteArityError(req.Cmd)

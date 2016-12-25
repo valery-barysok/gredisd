@@ -43,7 +43,7 @@ func BindHExists(app *app.App) {
 	app.Bind(HExistsCommand, hExistsCmd)
 }
 
-func hSetCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func hSetCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 3 {
 		res.WriteArityError(req.Cmd)
@@ -59,7 +59,7 @@ func hSetCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer)
 	return nil
 }
 
-func hGetCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func hGetCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 2 {
 		res.WriteArityError(req.Cmd)
@@ -77,7 +77,7 @@ func hGetCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer)
 	return nil
 }
 
-func hDelCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func hDelCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l < 2 {
 		res.WriteArityError(req.Cmd)
@@ -99,7 +99,7 @@ func hDelCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer)
 	return nil
 }
 
-func hLenCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func hLenCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 1 {
 		res.WriteArityError(req.Cmd)
@@ -115,7 +115,7 @@ func hLenCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer)
 	return nil
 }
 
-func hExistsCmd(context *app.ClientContext, req *app.RespRequest, res *resp.Writer) error {
+func hExistsCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
 	l := len(req.Args)
 	if l != 2 {
 		res.WriteArityError(req.Cmd)
