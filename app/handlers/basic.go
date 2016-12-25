@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/valery-barysok/gredisd/app"
+	"github.com/valery-barysok/gredisd/app/cmd"
 	"github.com/valery-barysok/resp"
 )
 
@@ -83,8 +84,8 @@ func BindExpire(app *app.App) {
 
 // BindNotFound binds handler for handling all unknown commands
 func BindNotFound(appl *app.App) {
-	appl.BindNotFound(func(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-		res.WriteUnknownCommandError(req.Cmd)
+	appl.BindNotFound(func(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
+		res.WriteUnknownCommandError(cmd.Cmd)
 		res.Flush()
 		return nil
 	})
@@ -98,8 +99,8 @@ func BindError(appl *app.App) {
 	})
 }
 
-func authFilter(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) (bool, error) {
-	if req.Cmd != AuthCommand && context.RequireAuth {
+func authFilter(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) (bool, error) {
+	if cmd.Cmd != AuthCommand && context.RequireAuth {
 		res.WriteErrorString("NOAUTH Authentication required.")
 		res.Flush()
 		return true, nil
@@ -107,12 +108,12 @@ func authFilter(context *app.ClientContext, req *app.RespCommand, res *resp.Writ
 	return false, nil
 }
 
-func authCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func authCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 1 {
-		res.WriteArityError(req.Cmd)
+		res.WriteArityError(cmd.Cmd)
 	} else {
-		context.RequireAuth = !context.App.Auth(string(req.Args[0].BulkString()))
+		context.RequireAuth = !context.App.Auth(string(cmd.Args[0].BulkString()))
 		if context.RequireAuth {
 			res.WriteErrorString("ERR invalid password")
 		} else {
@@ -123,12 +124,12 @@ func authCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer)
 	return nil
 }
 
-func selectCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func selectCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 1 {
-		res.WriteArityError(req.Cmd)
+		res.WriteArityError(cmd.Cmd)
 	} else {
-		db, err := context.App.Select(string(req.Args[0].BulkString()))
+		db, err := context.App.Select(string(cmd.Args[0].BulkString()))
 		if err != nil {
 			res.WriteErrorString(err.Error())
 		} else {
@@ -140,23 +141,23 @@ func selectCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Write
 	return nil
 }
 
-func echoCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func echoCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 1 {
-		res.WriteArityError(req.Cmd)
+		res.WriteArityError(cmd.Cmd)
 	} else {
-		res.WriteBulkString(req.Args[0].BulkString())
+		res.WriteBulkString(cmd.Args[0].BulkString())
 	}
 	res.Flush()
 	return nil
 }
 
-func pingCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func pingCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
+	l := len(cmd.Args)
 	if l > 1 {
-		res.WriteArityError(req.Cmd)
+		res.WriteArityError(cmd.Cmd)
 	} else if l == 1 {
-		res.WriteBulkString(req.Args[0].BulkString())
+		res.WriteBulkString(cmd.Args[0].BulkString())
 	} else {
 		res.WritePong()
 	}
@@ -164,24 +165,24 @@ func pingCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer)
 	return nil
 }
 
-func shutdownCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
+func shutdownCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
 	context.App.Shutdown()
 	return errors.New("Shutdown command received from client")
 }
 
-func commandCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
+func commandCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
 	commands := context.App.Commands()
 	res.WriteArray(commands)
 	res.Flush()
 	return nil
 }
 
-func keysCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func keysCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 1 {
-		res.WriteArityError(req.Cmd)
+		res.WriteArityError(cmd.Cmd)
 	} else {
-		keys, err := context.DB.Keys(req.Args[0].BulkString())
+		keys, err := context.DB.Keys(cmd.Args[0].BulkString())
 		if err != nil {
 			res.WriteError(err)
 		} else {
@@ -192,13 +193,13 @@ func keysCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer)
 	return nil
 }
 
-func existsCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func existsCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
+	l := len(cmd.Args)
 	if l < 1 {
-		res.WriteArityError(req.Cmd)
+		res.WriteArityError(cmd.Cmd)
 	} else {
-		keys := make([][]byte, 0, len(req.Args))
-		for _, arg := range req.Args {
+		keys := make([][]byte, 0, len(cmd.Args))
+		for _, arg := range cmd.Args {
 			keys = append(keys, arg.BulkString())
 		}
 
@@ -208,12 +209,12 @@ func existsCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Write
 	return nil
 }
 
-func expireCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func expireCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 2 {
-		res.WriteArityError(req.Cmd)
+		res.WriteArityError(cmd.Cmd)
 	} else {
-		res.WriteInteger(context.DB.Expire(req.Args[0].BulkString(), req.Args[1].BulkString()))
+		res.WriteInteger(context.DB.Expire(cmd.Args[0].BulkString(), cmd.Args[1].BulkString()))
 	}
 	res.Flush()
 	return nil

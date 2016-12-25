@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/valery-barysok/gredisd/app"
+	"github.com/valery-barysok/gredisd/app/cmd"
 	"github.com/valery-barysok/gredisd/app/model"
 	"github.com/valery-barysok/resp"
 )
@@ -65,134 +66,134 @@ func BindLRange(app *app.App) {
 type lrPush func(db *model.DBModel, key []byte, values ...[]byte) (int, error)
 type lrPop func(db *model.DBModel, key []byte) ([]byte, error)
 
-func lrpushCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer, push lrPush) error {
-	l := len(req.Args)
+func lrpushCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer, push lrPush) error {
+	l := len(cmd.Args)
 	if l < 1 {
-		res.WriteArityError(req.Cmd)
+		w.WriteArityError(cmd.Cmd)
 	} else {
-		l := len(req.Args)
+		l := len(cmd.Args)
 		values := make([][]byte, 0, l-1)
 		for i := 1; i < l; i++ {
-			values = append(values, req.Args[i].BulkString())
+			values = append(values, cmd.Args[i].BulkString())
 		}
-		cnt, err := push(context.DB, req.Args[0].BulkString(), values...)
+		cnt, err := push(context.DB, cmd.Args[0].BulkString(), values...)
 		if err != nil {
-			res.WriteError(err)
+			w.WriteError(err)
 		} else {
-			res.WriteInteger(cnt)
+			w.WriteInteger(cnt)
 		}
 	}
-	res.Flush()
+	w.Flush()
 	return nil
 }
 
-func lpushCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	return lrpushCmd(context, req, res, func(db *model.DBModel, key []byte, values ...[]byte) (int, error) {
+func lpushCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	return lrpushCmd(context, cmd, w, func(db *model.DBModel, key []byte, values ...[]byte) (int, error) {
 		return db.LPush(key, values...)
 	})
 }
 
-func rpushCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	return lrpushCmd(context, req, res, func(db *model.DBModel, key []byte, values ...[]byte) (int, error) {
+func rpushCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	return lrpushCmd(context, cmd, w, func(db *model.DBModel, key []byte, values ...[]byte) (int, error) {
 		return db.RPush(key, values...)
 	})
 }
 
-func lrpopCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer, pop lrPop) error {
-	l := len(req.Args)
+func lrpopCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer, pop lrPop) error {
+	l := len(cmd.Args)
 	if l != 1 {
-		res.WriteArityError(req.Cmd)
+		w.WriteArityError(cmd.Cmd)
 	} else {
-		value, err := pop(context.DB, req.Args[0].BulkString())
+		value, err := pop(context.DB, cmd.Args[0].BulkString())
 		if err != nil {
-			res.WriteError(err)
+			w.WriteError(err)
 		} else if value != nil {
-			res.WriteBulkString(value)
+			w.WriteBulkString(value)
 		} else {
-			res.WriteNilBulk()
+			w.WriteNilBulk()
 		}
 	}
-	res.Flush()
+	w.Flush()
 	return nil
 }
 
-func lpopCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	return lrpopCmd(context, req, res, func(db *model.DBModel, key []byte) ([]byte, error) {
+func lpopCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	return lrpopCmd(context, cmd, w, func(db *model.DBModel, key []byte) ([]byte, error) {
 		return db.LPop(key)
 	})
 }
 
-func rpopCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	return lrpopCmd(context, req, res, func(db *model.DBModel, key []byte) ([]byte, error) {
+func rpopCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	return lrpopCmd(context, cmd, w, func(db *model.DBModel, key []byte) ([]byte, error) {
 		return db.RPop(key)
 	})
 }
 
-func llenCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func llenCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 1 {
-		res.WriteArityError(req.Cmd)
+		w.WriteArityError(cmd.Cmd)
 	} else {
-		cnt, err := context.DB.LLen(req.Args[0].BulkString())
+		cnt, err := context.DB.LLen(cmd.Args[0].BulkString())
 		if err != nil {
-			res.WriteError(err)
+			w.WriteError(err)
 		} else {
-			res.WriteInteger(cnt)
+			w.WriteInteger(cnt)
 		}
 	}
-	res.Flush()
+	w.Flush()
 	return nil
 }
 
-func linsertCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func linsertCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 4 {
-		res.WriteArityError(req.Cmd)
+		w.WriteArityError(cmd.Cmd)
 	} else {
-		l, err := context.DB.LInsert(req.Args[0].BulkString(), req.Args[1].BulkString(),
-			req.Args[2].BulkString(), req.Args[3].BulkString())
+		l, err := context.DB.LInsert(cmd.Args[0].BulkString(), cmd.Args[1].BulkString(),
+			cmd.Args[2].BulkString(), cmd.Args[3].BulkString())
 		if err != nil {
-			res.WriteError(err)
+			w.WriteError(err)
 		} else {
-			res.WriteInteger(l)
+			w.WriteInteger(l)
 		}
 	}
-	res.Flush()
+	w.Flush()
 	return nil
 }
 
-func lindexCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func lindexCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 2 {
-		res.WriteArityError(req.Cmd)
+		w.WriteArityError(cmd.Cmd)
 	} else {
-		s, err := context.DB.LIndex(req.Args[0].BulkString(), req.Args[1].BulkString())
+		s, err := context.DB.LIndex(cmd.Args[0].BulkString(), cmd.Args[1].BulkString())
 		if err != nil {
-			res.WriteError(err)
+			w.WriteError(err)
 		} else if s != nil {
-			res.WriteBulkString(s)
+			w.WriteBulkString(s)
 		} else {
-			res.WriteNilBulk()
+			w.WriteNilBulk()
 		}
 	}
-	res.Flush()
+	w.Flush()
 	return nil
 }
 
-func lrangeCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func lrangeCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 3 {
-		res.WriteArityError(req.Cmd)
+		w.WriteArityError(cmd.Cmd)
 	} else {
-		values, err := context.DB.LRange(req.Args[0].BulkString(), req.Args[1].BulkString(), req.Args[2].BulkString())
+		values, err := context.DB.LRange(cmd.Args[0].BulkString(), cmd.Args[1].BulkString(), cmd.Args[2].BulkString())
 		if err != nil {
-			res.WriteError(err)
+			w.WriteError(err)
 		} else if values != nil {
-			res.WriteArray(values)
+			w.WriteArray(values)
 		} else {
-			res.WriteNilBulk()
+			w.WriteNilBulk()
 		}
 	}
-	res.Flush()
+	w.Flush()
 	return nil
 }

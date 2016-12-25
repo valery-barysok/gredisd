@@ -1,19 +1,11 @@
 package app
 
 import (
-	"bytes"
-	"errors"
 	"io"
 
+	"github.com/valery-barysok/gredisd/app/cmd"
 	"github.com/valery-barysok/resp"
 )
-
-var errInvalidRequest = errors.New("ERR Invalid Request")
-
-type RespCommand struct {
-	Cmd  string
-	Args []*resp.Message
-}
 
 type looper struct {
 	protocol *resp.Protocol
@@ -28,39 +20,22 @@ func newLooper(protocol *resp.Protocol, router *router) *looper {
 }
 
 func (looper *looper) loop(context *ClientContext, r io.Reader, w io.Writer) {
-	responder := resp.NewWriter(w, looper.protocol)
 	reader := resp.NewReader(r, looper.protocol)
+	writer := resp.NewWriter(w, looper.protocol)
 	for {
-		req, err := looper.readRespCommand(reader)
+		cmd, err := cmd.ReadCommand(reader)
 		if err != nil {
 			if looper.router.errorHandler != nil {
-				looper.router.errorHandler(context, err, responder)
+				looper.router.errorHandler(context, err, writer)
 			}
 			return
 		}
 
-		if err := looper.router.serve(context, req, responder); err != nil {
+		if err := looper.router.serve(context, cmd, writer); err != nil {
 			if looper.router.errorHandler != nil {
-				looper.router.errorHandler(context, err, responder)
+				looper.router.errorHandler(context, err, writer)
 			}
 			return
 		}
 	}
-}
-
-func (looper *looper) readRespCommand(reader *resp.Reader) (*RespCommand, error) {
-	msg, err := reader.Read()
-	if err != nil {
-		return nil, err
-	}
-
-	switch msgs := msg.Value.(type) {
-	case []*resp.Message:
-		return &RespCommand{
-			Cmd:  string(bytes.ToLower(msgs[0].BulkString())),
-			Args: msgs[1:],
-		}, nil
-	}
-
-	return nil, errInvalidRequest
 }

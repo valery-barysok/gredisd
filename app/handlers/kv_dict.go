@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/valery-barysok/gredisd/app"
+	"github.com/valery-barysok/gredisd/app/cmd"
 	"github.com/valery-barysok/resp"
 )
 
@@ -43,90 +44,90 @@ func BindHExists(app *app.App) {
 	app.Bind(HExistsCommand, hExistsCmd)
 }
 
-func hSetCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func hSetCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 3 {
-		res.WriteArityError(req.Cmd)
+		w.WriteArityError(cmd.Cmd)
 	} else {
-		cnt, err := context.DB.HSet(req.Args[0].BulkString(), req.Args[1].BulkString(), req.Args[2].BulkString())
+		cnt, err := context.DB.HSet(cmd.Args[0].BulkString(), cmd.Args[1].BulkString(), cmd.Args[2].BulkString())
 		if err != nil {
-			res.WriteError(err)
+			w.WriteError(err)
 		} else {
-			res.WriteInteger(cnt)
+			w.WriteInteger(cnt)
 		}
 	}
-	res.Flush()
+	w.Flush()
 	return nil
 }
 
-func hGetCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func hGetCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 2 {
-		res.WriteArityError(req.Cmd)
+		w.WriteArityError(cmd.Cmd)
 	} else {
-		val, err := context.DB.HGet(req.Args[0].BulkString(), req.Args[1].BulkString())
+		val, err := context.DB.HGet(cmd.Args[0].BulkString(), cmd.Args[1].BulkString())
 		if err != nil {
-			res.WriteError(err)
+			w.WriteError(err)
 		} else if val != nil {
-			res.WriteBulkString(val)
+			w.WriteBulkString(val)
 		} else {
-			res.WriteNilBulk()
+			w.WriteNilBulk()
 		}
 	}
-	res.Flush()
+	w.Flush()
 	return nil
 }
 
-func hDelCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func hDelCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	l := len(cmd.Args)
 	if l < 2 {
-		res.WriteArityError(req.Cmd)
+		w.WriteArityError(cmd.Cmd)
 	} else {
-		l := len(req.Args)
+		l := len(cmd.Args)
 		keys := make([][]byte, 0, l-1)
 		for i := 1; i < l; i++ {
-			keys = append(keys, req.Args[i].BulkString())
+			keys = append(keys, cmd.Args[i].BulkString())
 		}
 
-		cnt, err := context.DB.HDel(req.Args[0].BulkString(), keys...)
+		cnt, err := context.DB.HDel(cmd.Args[0].BulkString(), keys...)
 		if err != nil {
-			res.WriteError(err)
+			w.WriteError(err)
 		} else {
-			res.WriteInteger(cnt)
+			w.WriteInteger(cnt)
 		}
 	}
-	res.Flush()
+	w.Flush()
 	return nil
 }
 
-func hLenCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func hLenCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 1 {
-		res.WriteArityError(req.Cmd)
+		w.WriteArityError(cmd.Cmd)
 	} else {
-		l, err := context.DB.HLen(req.Args[0].BulkString())
+		l, err := context.DB.HLen(cmd.Args[0].BulkString())
 		if err != nil {
-			res.WriteError(err)
+			w.WriteError(err)
 		} else {
-			res.WriteInteger(l)
+			w.WriteInteger(l)
 		}
 	}
-	res.Flush()
+	w.Flush()
 	return nil
 }
 
-func hExistsCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func hExistsCmd(context *app.ClientContext, cmd *cmd.Command, w *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 2 {
-		res.WriteArityError(req.Cmd)
+		w.WriteArityError(cmd.Cmd)
 	} else {
-		cnt, err := context.DB.HExists(req.Args[0].BulkString(), req.Args[1].BulkString())
+		cnt, err := context.DB.HExists(cmd.Args[0].BulkString(), cmd.Args[1].BulkString())
 		if err != nil {
-			res.WriteError(err)
+			w.WriteError(err)
 		} else {
-			res.WriteInteger(cnt)
+			w.WriteInteger(cnt)
 		}
 	}
-	res.Flush()
+	w.Flush()
 	return nil
 }

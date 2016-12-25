@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/valery-barysok/gredisd/app"
+	"github.com/valery-barysok/gredisd/app/cmd"
 	"github.com/valery-barysok/resp"
 )
 
@@ -31,24 +32,24 @@ func BindDel(app *app.App) {
 	app.Bind(DelCommand, delCmd)
 }
 
-func setCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func setCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
+	l := len(cmd.Args)
 	if l < 2 {
-		res.WriteArityError(req.Cmd)
+		res.WriteArityError(cmd.Cmd)
 	} else {
-		context.DB.Set(req.Args[0].BulkString(), req.Args[1].BulkString())
+		context.DB.Set(cmd.Args[0].BulkString(), cmd.Args[1].BulkString())
 		res.WriteOK()
 	}
 	res.Flush()
 	return nil
 }
 
-func getCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func getCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
+	l := len(cmd.Args)
 	if l != 1 {
-		res.WriteArityError(req.Cmd)
+		res.WriteArityError(cmd.Cmd)
 	} else {
-		val, err := context.DB.Get(req.Args[0].BulkString())
+		val, err := context.DB.Get(cmd.Args[0].BulkString())
 		if err != nil {
 			res.WriteError(err)
 		} else if val != nil {
@@ -61,13 +62,13 @@ func getCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) 
 	return nil
 }
 
-func delCmd(context *app.ClientContext, req *app.RespCommand, res *resp.Writer) error {
-	l := len(req.Args)
+func delCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) error {
+	l := len(cmd.Args)
 	if l < 1 {
-		res.WriteArityError(req.Cmd)
+		res.WriteArityError(cmd.Cmd)
 	} else {
-		keys := make([][]byte, 0, len(req.Args))
-		for _, arg := range req.Args {
+		keys := make([][]byte, 0, len(cmd.Args))
+		for _, arg := range cmd.Args {
 			keys = append(keys, arg.BulkString())
 		}
 

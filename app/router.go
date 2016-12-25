@@ -3,6 +3,7 @@ package app
 import (
 	"strings"
 
+	"github.com/valery-barysok/gredisd/app/cmd"
 	"github.com/valery-barysok/resp"
 )
 
@@ -45,9 +46,9 @@ func (router *router) bindError(errorHandler ErrorHandler) ErrorHandler {
 	return oldHandler
 }
 
-func (router *router) serve(context *ClientContext, req *RespCommand, res *resp.Writer) error {
+func (router *router) serve(context *ClientContext, cmd *cmd.Command, res *resp.Writer) error {
 	for _, filter := range router.filters {
-		done, err := filter(context, req, res)
+		done, err := filter(context, cmd, res)
 		if err != nil {
 			return err
 		}
@@ -56,16 +57,14 @@ func (router *router) serve(context *ClientContext, req *RespCommand, res *resp.
 		}
 	}
 
-	return router.handle(context, req, res)
+	return router.handle(context, cmd, res)
 }
 
-func (router *router) handle(context *ClientContext, req *RespCommand, res *resp.Writer) error {
-	cmd := req.Cmd
-
-	if handle := router.routes[cmd]; handle != nil {
-		return handle(context, req, res)
+func (router *router) handle(context *ClientContext, cmd *cmd.Command, res *resp.Writer) error {
+	if handle := router.routes[cmd.Cmd]; handle != nil {
+		return handle(context, cmd, res)
 	} else if router.notFound != nil {
-		return router.notFound(context, req, res)
+		return router.notFound(context, cmd, res)
 	}
 
 	return nil

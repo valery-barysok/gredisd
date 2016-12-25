@@ -9,15 +9,16 @@ import (
 	"runtime"
 	"strconv"
 
+	"github.com/valery-barysok/gredisd/app/cmd"
 	"github.com/valery-barysok/gredisd/app/model"
 	"github.com/valery-barysok/gredisd/server"
 	"github.com/valery-barysok/resp"
 )
 
-type ErrorHandler func(context *ClientContext, err error, res *resp.Writer)
+type ErrorHandler func(context *ClientContext, err error, w *resp.Writer)
 
-type Filter func(context *ClientContext, req *RespCommand, res *resp.Writer) (bool, error)
-type Handler func(context *ClientContext, req *RespCommand, res *resp.Writer) error
+type Filter func(context *ClientContext, cmd *cmd.Command, w *resp.Writer) (bool, error)
+type Handler func(context *ClientContext, cmd *cmd.Command, w *resp.Writer) error
 
 type Info struct {
 	ID        string `json:"server_id"`

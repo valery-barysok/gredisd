@@ -3,13 +3,13 @@ package app
 import (
 	"bufio"
 	"net"
+	"os"
 	"sync"
 	"time"
 
 	"github.com/valery-barysok/gredisd/app/model"
 	"github.com/valery-barysok/gredisd/server"
 	"github.com/valery-barysok/resp"
-	"os"
 )
 
 type clientProvider struct {
