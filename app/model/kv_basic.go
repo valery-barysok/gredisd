@@ -7,6 +7,12 @@ import (
 	"sync"
 )
 
+const (
+	kvType     byte = 1
+	kvListType byte = 2
+	kvDictType byte = 3
+)
+
 var errWrongType = errors.New("WRONGTYPE Operation against a key holding the wrong kind of value")
 
 type keyValue struct {
@@ -15,13 +21,6 @@ type keyValue struct {
 	list   *list.List
 	dict   map[string]string
 	ttl    int64
-}
-
-func newKeyValue(s []byte) *keyValue {
-	return &keyValue{
-		kvType: kvType,
-		value:  s,
-	}
 }
 
 type KVModel struct {
@@ -40,27 +39,6 @@ func (kv *KVModel) Keys(pattern []byte) ([]interface{}, error) {
 	defer kv.mu.RUnlock()
 
 	return kv.keys(pattern)
-}
-
-func (kv *KVModel) Set(key []byte, value []byte) {
-	kv.mu.Lock()
-	defer kv.mu.Unlock()
-
-	kv.set(key, value)
-}
-
-func (kv *KVModel) Get(key []byte) ([]byte, error) {
-	kv.mu.RLock()
-	defer kv.mu.RUnlock()
-
-	return kv.get(key)
-}
-
-func (kv *KVModel) Del(keys ...[]byte) int {
-	kv.mu.RLock()
-	defer kv.mu.RUnlock()
-
-	return kv.delKeys(keys...)
 }
 
 func (kv *KVModel) Exists(keys ...[]byte) int {
@@ -82,50 +60,18 @@ func (kv *KVModel) keys(pattern []byte) ([]interface{}, error) {
 		return nil, err
 	}
 
-	list := list.New()
+	lst := list.New()
 	for k := range kv.storage {
 		if re.MatchString(k) {
-			list.PushBack([]byte(k))
+			lst.PushBack([]byte(k))
 		}
 	}
 
-	keys := make([]interface{}, 0, list.Len())
-	for e := list.Front(); e != nil; e = list.Front() {
-		keys = append(keys, list.Remove(e))
+	keys := make([]interface{}, 0, lst.Len())
+	for e := lst.Front(); e != nil; e = lst.Front() {
+		keys = append(keys, lst.Remove(e))
 	}
 	return keys, nil
-}
-
-func (kv *KVModel) set(key []byte, value []byte) {
-	kv.storage[string(key)] = newKeyValue(value)
-}
-
-func (kv *KVModel) get(key []byte) ([]byte, error) {
-	val, exists := kv.storage[string(key)]
-	if exists {
-		if val.kvType != kvType {
-			return nil, errWrongType
-		}
-		return val.value, nil
-	}
-
-	return nil, nil
-}
-
-func (kv *KVModel) delKeys(keys ...[]byte) int {
-	cnt := 0
-	for _, key := range keys {
-		cnt += kv.del(key)
-	}
-	return cnt
-}
-
-func (kv *KVModel) del(key []byte) int {
-	if kv.keyExists(key) {
-		delete(kv.storage, string(key))
-		return 1
-	}
-	return 0
 }
 
 func (kv *KVModel) keyExists(key []byte) bool {

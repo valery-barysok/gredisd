@@ -8,7 +8,7 @@ import (
 type lrPush func(list *list.List, v interface{}) *list.Element
 type lrPop func(list *list.List) []byte
 
-func newKVListType() *keyValue {
+func newKeyValueList() *keyValue {
 	return &keyValue{
 		kvType: kvListType,
 		list:   list.New(),
@@ -79,7 +79,7 @@ func (kv *KVModel) lrpush(push lrPush, key []byte, values ...[]byte) (int, error
 			return 0, errWrongType
 		}
 	} else {
-		val = newKVListType()
+		val = newKeyValueList()
 		kv.storage[k] = val
 	}
 

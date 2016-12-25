@@ -1,6 +1,6 @@
 package model
 
-func newKVDictType() *keyValue {
+func newKeyValueDict() *keyValue {
 	return &keyValue{
 		kvType: kvDictType,
 		dict:   make(map[string]string),
@@ -50,7 +50,7 @@ func (kv *KVModel) hset(key []byte, field []byte, value []byte) (int, error) {
 			return 0, errWrongType
 		}
 	} else {
-		val = newKVDictType()
+		val = newKeyValueDict()
 		kv.storage[k] = val
 	}
 
