@@ -39,7 +39,7 @@ func (looper *looper) loop(context *ClientContext, r io.Reader, w io.Writer) {
 			return
 		}
 
-		if err := looper.router.Serve(context, req, responder); err != nil {
+		if err := looper.router.serve(context, req, responder); err != nil {
 			if looper.router.errorHandler != nil {
 				looper.router.errorHandler(context, err, responder)
 			}

@@ -11,7 +11,13 @@ import (
 
 	"github.com/valery-barysok/gredisd/app/model"
 	"github.com/valery-barysok/gredisd/server"
+	"github.com/valery-barysok/resp"
 )
+
+type ErrorHandler func(context *ClientContext, err error, res *resp.Writer)
+
+type Filter func(context *ClientContext, req *RespCommand, res *resp.Writer) (bool, error)
+type Handler func(context *ClientContext, req *RespCommand, res *resp.Writer) error
 
 type Info struct {
 	ID        string `json:"server_id"`
@@ -50,7 +56,7 @@ func NewApp(opts *Options) *App {
 	app := &App{
 		info:   info,
 		opts:   opts,
-		router: NewRouter(),
+		router: newRouter(),
 		model:  model.NewAppModel(opts.Databases),
 	}
 
@@ -102,20 +108,20 @@ func (app *App) Commands() []interface{} {
 }
 
 func (app *App) BindFilter(filter Filter) {
-	app.router.BindFilter(filter)
+	app.router.bindFilter(filter)
 }
 
 func (app *App) Bind(cmd string, handler Handler) Handler {
 	app.model.AddCmd(cmd)
-	return app.router.Bind(cmd, handler)
+	return app.router.bind(cmd, handler)
 }
 
 func (app *App) BindNotFound(handler Handler) Handler {
-	return app.router.BindNotFound(handler)
+	return app.router.bindNotFound(handler)
 }
 
 func (app *App) BindError(errorHandler ErrorHandler) ErrorHandler {
-	return app.router.BindError(errorHandler)
+	return app.router.bindError(errorHandler)
 }
 
 func (app *App) RequireAuth() bool {
