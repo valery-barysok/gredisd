@@ -7,42 +7,42 @@ func newKeyValueDict() *keyValue {
 	}
 }
 
-func (kv *KVModel) HSet(key []byte, field []byte, value []byte) (int, error) {
+func (kv *kvModel) HSet(key []byte, field []byte, value []byte) (int, error) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 
 	return kv.hset(key, field, value)
 }
 
-func (kv *KVModel) HGet(key []byte, field []byte) ([]byte, error) {
+func (kv *kvModel) HGet(key []byte, field []byte) ([]byte, error) {
 	kv.mu.RLock()
 	defer kv.mu.RUnlock()
 
 	return kv.hget(key, field)
 }
 
-func (kv *KVModel) HDel(key []byte, fields ...[]byte) (int, error) {
+func (kv *kvModel) HDel(key []byte, fields ...[]byte) (int, error) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 
 	return kv.hdel(key, fields...)
 }
 
-func (kv *KVModel) HLen(key []byte, fields ...[]byte) (int, error) {
+func (kv *kvModel) HLen(key []byte, fields ...[]byte) (int, error) {
 	kv.mu.RLock()
 	defer kv.mu.RUnlock()
 
 	return kv.hlen(key)
 }
 
-func (kv *KVModel) HExists(key []byte, field []byte) (int, error) {
+func (kv *kvModel) HExists(key []byte, field []byte) (int, error) {
 	kv.mu.RLock()
 	defer kv.mu.RUnlock()
 
 	return kv.hexists(key, field)
 }
 
-func (kv *KVModel) hset(key []byte, field []byte, value []byte) (int, error) {
+func (kv *kvModel) hset(key []byte, field []byte, value []byte) (int, error) {
 	k := string(key)
 	val, exists := kv.storage[k]
 	if exists {
@@ -63,7 +63,7 @@ func (kv *KVModel) hset(key []byte, field []byte, value []byte) (int, error) {
 	return 1, nil
 }
 
-func (kv *KVModel) hget(key []byte, field []byte) ([]byte, error) {
+func (kv *kvModel) hget(key []byte, field []byte) ([]byte, error) {
 	k := string(key)
 	val, exists := kv.storage[k]
 	if !exists {
@@ -81,7 +81,7 @@ func (kv *KVModel) hget(key []byte, field []byte) ([]byte, error) {
 	return nil, nil
 }
 
-func (kv *KVModel) hdel(key []byte, fields ...[]byte) (int, error) {
+func (kv *kvModel) hdel(key []byte, fields ...[]byte) (int, error) {
 	k := string(key)
 	val, exists := kv.storage[k]
 	if !exists {
@@ -105,7 +105,7 @@ func (kv *KVModel) hdel(key []byte, fields ...[]byte) (int, error) {
 	return cnt, nil
 }
 
-func (kv *KVModel) hlen(key []byte) (int, error) {
+func (kv *kvModel) hlen(key []byte) (int, error) {
 	k := string(key)
 	val, exists := kv.storage[k]
 	if exists {
@@ -119,7 +119,7 @@ func (kv *KVModel) hlen(key []byte) (int, error) {
 	return 0, nil
 }
 
-func (kv *KVModel) hexists(key []byte, field []byte) (int, error) {
+func (kv *kvModel) hexists(key []byte, field []byte) (int, error) {
 	k := string(key)
 	val, exists := kv.storage[k]
 	if exists {

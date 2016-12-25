@@ -23,38 +23,38 @@ type keyValue struct {
 	ttl    int64
 }
 
-type KVModel struct {
+type kvModel struct {
 	mu      sync.RWMutex
 	storage map[string]*keyValue
 }
 
-func newKVModel() *KVModel {
-	return &KVModel{
+func newKVModel() *kvModel {
+	return &kvModel{
 		storage: make(map[string]*keyValue),
 	}
 }
 
-func (kv *KVModel) Keys(pattern []byte) ([]interface{}, error) {
+func (kv *kvModel) Keys(pattern []byte) ([]interface{}, error) {
 	kv.mu.RLock()
 	defer kv.mu.RUnlock()
 
 	return kv.keys(pattern)
 }
 
-func (kv *KVModel) Exists(keys ...[]byte) int {
+func (kv *kvModel) Exists(keys ...[]byte) int {
 	kv.mu.RLock()
 	defer kv.mu.RUnlock()
 
 	return kv.exists(keys...)
 }
 
-func (kv *KVModel) Expire(key []byte, value []byte) {
+func (kv *kvModel) Expire(key []byte, value []byte) {
 	//kv.mu.Lock()
 	//defer kv.mu.Unlock()
 	//kv.set(key, value)
 }
 
-func (kv *KVModel) keys(pattern []byte) ([]interface{}, error) {
+func (kv *kvModel) keys(pattern []byte) ([]interface{}, error) {
 	re, err := regexp.CompilePOSIX(string(pattern))
 	if err != nil {
 		return nil, err
@@ -74,12 +74,12 @@ func (kv *KVModel) keys(pattern []byte) ([]interface{}, error) {
 	return keys, nil
 }
 
-func (kv *KVModel) keyExists(key []byte) bool {
+func (kv *kvModel) keyExists(key []byte) bool {
 	_, exists := kv.storage[string(key)]
 	return exists
 }
 
-func (kv *KVModel) exists(keys ...[]byte) int {
+func (kv *kvModel) exists(keys ...[]byte) int {
 	cnt := 0
 	for _, key := range keys {
 		if kv.keyExists(key) {

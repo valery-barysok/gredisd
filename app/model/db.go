@@ -18,7 +18,7 @@ var (
 
 type DBModel struct {
 	index int
-	kv    *KVModel
+	kv    *kvModel
 }
 
 func newDBModel(index int) *DBModel {

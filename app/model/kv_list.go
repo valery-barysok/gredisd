@@ -15,63 +15,63 @@ func newKeyValueList() *keyValue {
 	}
 }
 
-func (kv *KVModel) LPush(key []byte, values ...[]byte) (int, error) {
+func (kv *kvModel) LPush(key []byte, values ...[]byte) (int, error) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 
 	return kv.lpush(key, values...)
 }
 
-func (kv *KVModel) RPush(key []byte, values ...[]byte) (int, error) {
+func (kv *kvModel) RPush(key []byte, values ...[]byte) (int, error) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 
 	return kv.rpush(key, values...)
 }
 
-func (kv *KVModel) LPop(key []byte) ([]byte, error) {
+func (kv *kvModel) LPop(key []byte) ([]byte, error) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 
 	return kv.lpop(key)
 }
 
-func (kv *KVModel) RPop(key []byte) ([]byte, error) {
+func (kv *kvModel) RPop(key []byte) ([]byte, error) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 
 	return kv.rpop(key)
 }
 
-func (kv *KVModel) LLen(key []byte) (int, error) {
+func (kv *kvModel) LLen(key []byte) (int, error) {
 	kv.mu.RLock()
 	defer kv.mu.RUnlock()
 
 	return kv.llen(key)
 }
 
-func (kv *KVModel) LInsert(key []byte, before bool, pivot []byte, value []byte) (int, error) {
+func (kv *kvModel) LInsert(key []byte, before bool, pivot []byte, value []byte) (int, error) {
 	kv.mu.Lock()
 	defer kv.mu.Unlock()
 
 	return kv.linsert(key, before, pivot, value)
 }
 
-func (kv *KVModel) LIndex(key []byte, index int) ([]byte, error) {
+func (kv *kvModel) LIndex(key []byte, index int) ([]byte, error) {
 	kv.mu.RLock()
 	defer kv.mu.RUnlock()
 
 	return kv.lindex(key, index)
 }
 
-func (kv *KVModel) LRange(key []byte, start int, stop int) ([]interface{}, error) {
+func (kv *kvModel) LRange(key []byte, start int, stop int) ([]interface{}, error) {
 	kv.mu.RLock()
 	defer kv.mu.RUnlock()
 
 	return kv.lrange(key, start, stop)
 }
 
-func (kv *KVModel) lrpush(push lrPush, key []byte, values ...[]byte) (int, error) {
+func (kv *kvModel) lrpush(push lrPush, key []byte, values ...[]byte) (int, error) {
 	k := string(key)
 	val, exists := kv.storage[k]
 	if exists {
@@ -90,19 +90,19 @@ func (kv *KVModel) lrpush(push lrPush, key []byte, values ...[]byte) (int, error
 	return val.list.Len(), nil
 }
 
-func (kv *KVModel) lpush(key []byte, values ...[]byte) (int, error) {
+func (kv *kvModel) lpush(key []byte, values ...[]byte) (int, error) {
 	return kv.lrpush(func(list *list.List, v interface{}) *list.Element {
 		return list.PushFront(v)
 	}, key, values...)
 }
 
-func (kv *KVModel) rpush(key []byte, values ...[]byte) (int, error) {
+func (kv *kvModel) rpush(key []byte, values ...[]byte) (int, error) {
 	return kv.lrpush(func(list *list.List, v interface{}) *list.Element {
 		return list.PushBack(v)
 	}, key, values...)
 }
 
-func (kv *KVModel) lrpop(pop lrPop, key []byte) ([]byte, error) {
+func (kv *kvModel) lrpop(pop lrPop, key []byte) ([]byte, error) {
 	k := string(key)
 	val, exists := kv.storage[k]
 	if exists {
@@ -121,19 +121,19 @@ func (kv *KVModel) lrpop(pop lrPop, key []byte) ([]byte, error) {
 	return e, nil
 }
 
-func (kv *KVModel) lpop(key []byte) ([]byte, error) {
+func (kv *kvModel) lpop(key []byte) ([]byte, error) {
 	return kv.lrpop(func(list *list.List) []byte {
 		return list.Remove(list.Front()).([]byte)
 	}, key)
 }
 
-func (kv *KVModel) rpop(key []byte) ([]byte, error) {
+func (kv *kvModel) rpop(key []byte) ([]byte, error) {
 	return kv.lrpop(func(list *list.List) []byte {
 		return list.Remove(list.Back()).([]byte)
 	}, key)
 }
 
-func (kv *KVModel) llen(key []byte) (int, error) {
+func (kv *kvModel) llen(key []byte) (int, error) {
 	val, exists := kv.storage[string(key)]
 	if exists {
 		if val.kvType != kvListType {
@@ -146,7 +146,7 @@ func (kv *KVModel) llen(key []byte) (int, error) {
 	return 0, nil
 }
 
-func (kv *KVModel) linsert(key []byte, before bool, pivot []byte, value []byte) (int, error) {
+func (kv *kvModel) linsert(key []byte, before bool, pivot []byte, value []byte) (int, error) {
 	val, exists := kv.storage[string(key)]
 	if exists {
 		if val.kvType != kvListType {
@@ -171,7 +171,7 @@ func (kv *KVModel) linsert(key []byte, before bool, pivot []byte, value []byte) 
 	return 0, nil
 }
 
-func (kv *KVModel) lindex(key []byte, index int) ([]byte, error) {
+func (kv *kvModel) lindex(key []byte, index int) ([]byte, error) {
 	val, exists := kv.storage[string(key)]
 	if exists {
 		if val.kvType != kvListType {
@@ -193,7 +193,7 @@ func (kv *KVModel) lindex(key []byte, index int) ([]byte, error) {
 	return nil, nil
 }
 
-func (kv *KVModel) lrange(key []byte, start int, stop int) ([]interface{}, error) {
+func (kv *kvModel) lrange(key []byte, start int, stop int) ([]interface{}, error) {
 	val, exists := kv.storage[string(key)]
 	if exists {
 		if val.kvType != kvListType {
