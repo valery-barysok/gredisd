@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/valery-barysok/gredisd/app"
-	"github.com/valery-barysok/gredisd/gredisd-app"
+	"github.com/valery-barysok/gredisd/app/gredisd"
 )
 
 var usageStr = `
