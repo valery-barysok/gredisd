@@ -54,14 +54,13 @@ func (looper *looper) readRespCommand(reader *resp.Reader) (*RespCommand, error)
 		return nil, err
 	}
 
-	switch it := msg.Value.(type) {
+	switch msgs := msg.Value.(type) {
 	case []*resp.Message:
-		msgs := it
 		return &RespCommand{
 			Cmd:  string(bytes.ToLower(msgs[0].BulkString())),
 			Args: msgs[1:],
 		}, nil
-	default:
-		return nil, errInvalidRequest
 	}
+
+	return nil, errInvalidRequest
 }
