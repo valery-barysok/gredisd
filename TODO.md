@@ -4,7 +4,7 @@ Simple implementation of Redis-like in-memory cache
 
 Desired features:
 - [x] Key-value storage with string, lists, dict support
-- [ ] Per-key TTL
+- [x] Per-key TTL
 - [x] Operations:
   - Get
   - Set
