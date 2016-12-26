@@ -33,7 +33,7 @@ func (kv *kvModel) set(key []byte, value []byte) {
 }
 
 func (kv *kvModel) get(key []byte) ([]byte, error) {
-	val, exists := kv.storage[string(key)]
+	val, exists := kv.tryGet(string(key))
 	if exists {
 		if val.kvType != kvType {
 			return nil, errWrongType

@@ -214,7 +214,12 @@ func expireCmd(context *app.ClientContext, cmd *cmd.Command, res *resp.Writer) e
 	if l != 2 {
 		res.WriteArityError(cmd.Cmd)
 	} else {
-		res.WriteInteger(context.DB.Expire(cmd.Args[0].BulkString(), cmd.Args[1].BulkString()))
+		ok, err := context.DB.Expire(cmd.Args[0].BulkString(), cmd.Args[1].BulkString())
+		if err != nil {
+			res.WriteError(err)
+		} else {
+			res.WriteInteger(ok)
+		}
 	}
 	res.Flush()
 	return nil

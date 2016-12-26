@@ -73,7 +73,7 @@ func (kv *kvModel) LRange(key []byte, start int, stop int) ([]interface{}, error
 
 func (kv *kvModel) lrpush(push lrPush, key []byte, values ...[]byte) (int, error) {
 	k := string(key)
-	val, exists := kv.storage[k]
+	val, exists := kv.tryGet(k)
 	if exists {
 		if val.kvType != kvListType {
 			return 0, errWrongType
@@ -104,7 +104,7 @@ func (kv *kvModel) rpush(key []byte, values ...[]byte) (int, error) {
 
 func (kv *kvModel) lrpop(pop lrPop, key []byte) ([]byte, error) {
 	k := string(key)
-	val, exists := kv.storage[k]
+	val, exists := kv.tryGet(k)
 	if exists {
 		if val.kvType != kvListType {
 			return nil, errWrongType
@@ -134,7 +134,7 @@ func (kv *kvModel) rpop(key []byte) ([]byte, error) {
 }
 
 func (kv *kvModel) llen(key []byte) (int, error) {
-	val, exists := kv.storage[string(key)]
+	val, exists := kv.tryGet(string(key))
 	if exists {
 		if val.kvType != kvListType {
 			return 0, errWrongType
@@ -147,7 +147,7 @@ func (kv *kvModel) llen(key []byte) (int, error) {
 }
 
 func (kv *kvModel) linsert(key []byte, before bool, pivot []byte, value []byte) (int, error) {
-	val, exists := kv.storage[string(key)]
+	val, exists := kv.tryGet(string(key))
 	if exists {
 		if val.kvType != kvListType {
 			return 0, errWrongType
@@ -172,7 +172,7 @@ func (kv *kvModel) linsert(key []byte, before bool, pivot []byte, value []byte) 
 }
 
 func (kv *kvModel) lindex(key []byte, index int) ([]byte, error) {
-	val, exists := kv.storage[string(key)]
+	val, exists := kv.tryGet(string(key))
 	if exists {
 		if val.kvType != kvListType {
 			return nil, errWrongType
@@ -194,7 +194,7 @@ func (kv *kvModel) lindex(key []byte, index int) ([]byte, error) {
 }
 
 func (kv *kvModel) lrange(key []byte, start int, stop int) ([]interface{}, error) {
-	val, exists := kv.storage[string(key)]
+	val, exists := kv.tryGet(string(key))
 	if exists {
 		if val.kvType != kvListType {
 			return nil, errWrongType

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"regexp"
 	"sync"
+	"time"
 )
 
 const (
@@ -48,10 +49,11 @@ func (kv *kvModel) Exists(keys ...[]byte) int {
 	return kv.exists(keys...)
 }
 
-func (kv *kvModel) Expire(key []byte, value []byte) {
-	//kv.mu.Lock()
-	//defer kv.mu.Unlock()
-	//kv.set(key, value)
+func (kv *kvModel) Expire(key []byte, ttl int64) int {
+	kv.mu.Lock()
+	defer kv.mu.Unlock()
+
+	return kv.expire(key, ttl)
 }
 
 func (kv *kvModel) keys(pattern []byte) ([]interface{}, error) {
@@ -60,10 +62,15 @@ func (kv *kvModel) keys(pattern []byte) ([]interface{}, error) {
 		return nil, err
 	}
 
+	now := time.Now().Unix()
+
 	lst := list.New()
 	for k := range kv.storage {
 		if re.MatchString(k) {
-			lst.PushBack([]byte(k))
+			_, exists := kv.tryGetN(k, now)
+			if exists {
+				lst.PushBack([]byte(k))
+			}
 		}
 	}
 
@@ -75,16 +82,56 @@ func (kv *kvModel) keys(pattern []byte) ([]interface{}, error) {
 }
 
 func (kv *kvModel) keyExists(key []byte) bool {
-	_, exists := kv.storage[string(key)]
+	return kv.keyExistsN(key, time.Now().Unix())
+}
+
+func (kv *kvModel) keyExistsN(key []byte, now int64) bool {
+	_, exists := kv.tryGetN(string(key), now)
 	return exists
 }
 
 func (kv *kvModel) exists(keys ...[]byte) int {
+	now := time.Now().Unix()
+
 	cnt := 0
 	for _, key := range keys {
-		if kv.keyExists(key) {
+		if kv.keyExistsN(key, now) {
 			cnt++
 		}
 	}
 	return cnt
+}
+
+func (kv *kvModel) expire(key []byte, ttl int64) int {
+	now := time.Now().Unix()
+
+	val, exists := kv.tryGetN(string(key), now)
+	if !exists {
+		return 0
+	}
+
+	val.ttl = ttl + now
+	return 1
+}
+
+func (kv *kvModel) tryGet(key string) (*keyValue, bool) {
+	return kv.tryGetN(key, time.Now().Unix())
+}
+
+func (kv *kvModel) tryGetN(key string, now int64) (*keyValue, bool) {
+	val, exists := kv.storage[key]
+	if !exists {
+		return nil, false
+	}
+
+	if isExpired(val, now) {
+		delete(kv.storage, key)
+		return nil, false
+	}
+
+	return val, true
+}
+
+func isExpired(val *keyValue, now int64) bool {
+	return val.ttl != 0 && val.ttl-now <= 0
 }

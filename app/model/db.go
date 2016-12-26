@@ -49,9 +49,17 @@ func (db *DBModel) Exists(keys ...[]byte) int {
 	return db.kv.Exists(keys...)
 }
 
-func (db *DBModel) Expire(key []byte, seconds []byte) int {
-	// TODO: implement Expire
-	return 0
+func (db *DBModel) Expire(key []byte, seconds []byte) (int, error) {
+	s, err := strconv.ParseInt(string(seconds), 10, 64)
+	if err != nil {
+		return 0, errInvalidInteger
+	}
+
+	return db.ExpireN(key, s), nil
+}
+
+func (db *DBModel) ExpireN(key []byte, seconds int64) int {
+	return db.kv.Expire(key, seconds)
 }
 
 func (db *DBModel) LPush(key []byte, values ...[]byte) (int, error) {

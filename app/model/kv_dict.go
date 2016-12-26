@@ -44,7 +44,7 @@ func (kv *kvModel) HExists(key []byte, field []byte) (int, error) {
 
 func (kv *kvModel) hset(key []byte, field []byte, value []byte) (int, error) {
 	k := string(key)
-	val, exists := kv.storage[k]
+	val, exists := kv.tryGet(k)
 	if exists {
 		if val.kvType != kvDictType {
 			return 0, errWrongType
@@ -65,7 +65,7 @@ func (kv *kvModel) hset(key []byte, field []byte, value []byte) (int, error) {
 
 func (kv *kvModel) hget(key []byte, field []byte) ([]byte, error) {
 	k := string(key)
-	val, exists := kv.storage[k]
+	val, exists := kv.tryGet(k)
 	if !exists {
 		return nil, nil
 	}
@@ -83,7 +83,7 @@ func (kv *kvModel) hget(key []byte, field []byte) ([]byte, error) {
 
 func (kv *kvModel) hdel(key []byte, fields ...[]byte) (int, error) {
 	k := string(key)
-	val, exists := kv.storage[k]
+	val, exists := kv.tryGet(k)
 	if !exists {
 		return 0, nil
 	}
@@ -107,7 +107,7 @@ func (kv *kvModel) hdel(key []byte, fields ...[]byte) (int, error) {
 
 func (kv *kvModel) hlen(key []byte) (int, error) {
 	k := string(key)
-	val, exists := kv.storage[k]
+	val, exists := kv.tryGet(k)
 	if exists {
 		if val.kvType != kvDictType {
 			return 0, errWrongType
@@ -121,7 +121,7 @@ func (kv *kvModel) hlen(key []byte) (int, error) {
 
 func (kv *kvModel) hexists(key []byte, field []byte) (int, error) {
 	k := string(key)
-	val, exists := kv.storage[k]
+	val, exists := kv.tryGet(k)
 	if exists {
 		if val.kvType != kvDictType {
 			return 0, errWrongType
